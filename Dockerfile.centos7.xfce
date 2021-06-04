@@ -1,0 +1,19 @@
+FROM centos:7
+
+RUN yum -y update \
+ && yum -y install epel-release \
+ && yum -y groupinstall xfce \
+ && bash -c 'echo PREFERRED=/usr/bin/xfce4-session > /etc/sysconfig/desktop' \
+ && yum install -y xrdp xorgxrdp \
+ && yum -y install sudo nload passwd nano
+
+COPY ./build/xrdp.ini ./build/startwm-xfce.sh /etc/xrdp/
+RUN mv /etc/xrdp/startwm-xfce.sh /etc/xrdp/startwm.sh
+#&& chmod a+x /etc/xrdp/startwm.sh
+
+COPY ./build/run.sh /
+#RUN chmod +x /run.sh
+
+EXPOSE 3389
+
+ENTRYPOINT ["/run.sh"]

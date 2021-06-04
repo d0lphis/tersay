@@ -1,0 +1,21 @@
+FROM amazonlinux:latest
+
+RUN yum -y update \
+ && amazon-linux-extras install mate-desktop1.x \
+ && bash -c 'echo PREFERRED=/usr/bin/mate-session > /etc/sysconfig/desktop' \
+ && amazon-linux-extras enable epel \
+ && amazon-linux-extras install epel \
+ && yum install -y xrdp xorgxrdp \
+ && yum -y install sudo nload passwd nano \
+ && yum -y install pluma caja-open-terminal
+
+COPY ./build/xrdp.ini ./build/startwm-mate.sh /etc/xrdp/
+RUN mv /etc/xrdp/startwm-mate.sh /etc/xrdp/startwm.sh
+#&& chmod a+x /etc/xrdp/startwm.sh
+
+COPY ./build/run.sh /
+#RUN chmod +x /run.sh
+
+EXPOSE 3389
+
+ENTRYPOINT ["/run.sh"]

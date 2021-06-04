@@ -1,0 +1,20 @@
+FROM fedora:latest
+
+RUN dnf -y update \
+ && dnf -y groupinstall xfce \
+ && bash -c 'echo PREFERRED=/usr/bin/xfce4-session > /etc/sysconfig/desktop' \
+ && dnf install -y xrdp xorgxrdp \
+ && dnf -y install sudo nload passwd nano gedit \
+ && dnf clean all
+
+COPY ./build/xrdp.ini ./build/centos8-sesman.ini ./build/startwm-xfce.sh /etc/xrdp/
+RUN mv /etc/xrdp/centos8-sesman.ini /etc/xrdp/sesman.ini\
+ && mv /etc/xrdp/startwm-xfce.sh /etc/xrdp/startwm.sh
+#RUN chmod a+x /etc/xrdp/startwm.sh
+
+COPY ./build/run.sh /
+#RUN chmod +x /run.sh
+
+EXPOSE 3389
+
+ENTRYPOINT ["/run.sh"]

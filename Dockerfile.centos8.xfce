@@ -1,0 +1,20 @@
+FROM centos:8
+
+RUN yum -y update \
+ && yum -y install epel-release \
+ && yum -y groupinstall xfce base-x \
+ && bash -c 'echo PREFERRED=/usr/bin/xfce4-session > /etc/sysconfig/desktop' \
+ && yum install -y xrdp xorgxrdp \
+ && yum -y install sudo nload passwd nano gedit
+
+COPY ./build/xrdp.ini ./build/centos8-sesman.ini ./build/startwm-xfce.sh /etc/xrdp/
+RUN mv /etc/xrdp/centos8-sesman.ini /etc/xrdp/sesman.ini \
+ && mv /etc/xrdp/startwm-xfce.sh /etc/xrdp/startwm.sh
+#&& chmod a+x /etc/xrdp/startwm.sh
+
+COPY ./build/run.sh /
+#RUN chmod +x /run.sh
+
+EXPOSE 3389
+
+ENTRYPOINT ["/run.sh"]

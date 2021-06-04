@@ -1,0 +1,26 @@
+FROM centos:6.6
+
+RUN bash -c "sed 's|#baseurl=http://mirror.centos.org/centos/\$releasever|baseurl=https://vault.centos.org/6.6|g; s|mirrorlist=http|#mirrorlist=http|g' /etc/yum.repos.d/CentOS-Base.repo > /etc/yum.repos.d/CentOS-6.6.repo" \
+ && mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo~ \
+ && yum install -y epel-release \
+ && bash -c "sed 's|#baseurl=http://download.fedoraproject.org/pub|baseurl=http://archives.fedoraproject.org/pub/archive|g; s|mirrorlist=http|#mirrorlist=http|g' /etc/yum.repos.d/epel.repo > /etc/yum.repos.d/epel6.repo" \
+ && mv /etc/yum.repos.d/epel.repo /etc/yum.repos.d/epel.repo~ \
+ && yum groupinstall -y Xfce \
+ && yum install -y xrdp *tigervnc* \
+ && yum groupinstall -y "Development Tools" \
+ && yum install -y tar zlib-devel glibc.i686 freetype.i686 libpng-devel.i686 libjpeg-turbo.i686 pam-devel
+#&& yum install -y sudo nload passwd nano \
+#&& yum update -y && yum autoremove -y
+
+COPY ./build/startwm-xfce.sh /etc/xrdp/
+RUN ln -s /usr/lib/libpng.so /usr/lib/libpng.so.2 \
+ && mv /etc/xrdp/startwm-xfce.sh /etc/xrdp/startwm.sh
+#RUN bash -c 'echo "exec /usr/bin/xfce4-session" >> ~/.xinitrc' \
+#&& chmod a+x /etc/xrdp/startwm.sh
+
+COPY ./build/run.sh /
+#RUN chmod +x /run.sh
+
+EXPOSE 3389
+
+ENTRYPOINT ["/run.sh"]

@@ -1,0 +1,19 @@
+FROM centos:7
+
+RUN yum -y update \
+ && yum install -y epel-release \
+ && yum -y groups install "MATE Desktop" \
+ && bash -c 'echo PREFERRED=/usr/bin/mate-session > /etc/sysconfig/desktop' \
+ && yum install -y xrdp xorgxrdp \
+ && yum -y install sudo nload passwd nano \
+ && yum -y install pluma caja-open-terminal
+
+COPY ./build/xrdp.ini ./build/startwm-mate.sh /etc/xrdp/
+RUN mv /etc/xrdp/startwm-mate.sh /etc/xrdp/startwm.sh
+
+COPY ./build/run.sh /
+#RUN chmod +x /run.sh
+
+EXPOSE 3389
+
+ENTRYPOINT ["/run.sh"]

@@ -1,0 +1,22 @@
+FROM fedora:latest
+
+RUN dnf -y update \
+#&& dnf -y install fedora-release --allowerasing \
+ && dnf -y install fedora-release-matecompiz --allowerasing \
+#&& dnf -y install compiz compiz-manager libcompizconfig \
+ && bash -c 'echo PREFERRED=/usr/bin/mate-session > /etc/sysconfig/desktop' \
+ && dnf install -y xrdp xorgxrdp openssh \
+ && dnf -y install sudo nload passwd nano pluma \
+ && dnf clean all
+
+COPY ./build/xrdp.ini ./build/centos8-sesman.ini ./build/startwm-mate.sh /etc/xrdp/
+RUN mv /etc/xrdp/centos8-sesman.ini /etc/xrdp/sesman.ini\
+ && mv /etc/xrdp/startwm-mate.sh /etc/xrdp/startwm.sh
+#RUN chmod a+x /etc/xrdp/startwm.sh
+
+COPY ./build/run.sh /
+#RUN chmod +x /run.sh
+
+EXPOSE 3389
+
+ENTRYPOINT ["/run.sh"]

@@ -1,10 +1,11 @@
 FROM centos:7
 
 RUN yum install -y epel-release \
- && yum groupinstall -y xfce && yum install -y xrdp xorgxrdp \
+ && yum groupinstall -y xfce \
+ && yum install -y xrdp xorgxrdp \
  && yum group install -y "Development Tools" && yum install -y sudo nload passwd nano zlib-devel libicu-devel glibc.i686 freetype.i686 libpng-devel.i686 libjpeg-turbo.i686 pam-devel \
  && ln -s /usr/lib/libpng.so /usr/lib/libpng.so.2 \
- && yum update -y && yum autoremove -y && yum clean all && rm -rf /var/cache/yum && rm -rf /var/tmp/yum-* && package-cleanup --oldkernels --count=1 && rm -rf /tmp/*
+ && yum update -y && yum autoremove -y && yum clean all && rm -rf /var/cache/yum /var/tmp/yum-* && package-cleanup --oldkernels --count=1 && rm -rf /tmp/*
 
 COPY ./build/xrdp.ini ./build/startwm-xfce.sh /etc/xrdp/
 RUN bash -c 'echo PREFERRED=/usr/bin/xfce4-session > /etc/sysconfig/desktop' \

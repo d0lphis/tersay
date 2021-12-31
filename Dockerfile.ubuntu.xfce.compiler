@@ -1,0 +1,24 @@
+FROM ubuntu:latest
+
+ENV DEBIAN_FRONTEND noninteractive
+
+RUN apt-get update -y \
+ && apt-get install -y xfce4 xfce4-clipman-plugin xfce4-cpugraph-plugin xfce4-netload-plugin xfce4-screenshooter xfce4-taskmanager xfce4-terminal xfce4-xkb-plugin \
+ && apt-get install -y xorgxrdp xrdp \
+ && apt-get install -y build-essential && apt-get install -y sudo wget curl vim python git \
+ && apt-get remove -y light-locker xscreensaver \
+ && apt-get update -y && apt-get upgrade -y && apt-get autoremove -y && apt-get autoclean && rm -rf /var/cache/apt /var/lib/apt/lists && apt-get --purge autoremove && rm -rf /tmp/*
+
+# https://github.com/danielguerra69/ubuntu-xrdp/blob/master/Dockerfile
+RUN mkdir /var/run/dbus \
+ && cp /etc/X11/xrdp/xorg.conf /etc/X11 \
+ && sed -i "s/console/anybody/g" /etc/X11/Xwrapper.config \
+ && sed -i "s/xrdp\/xorg/xorg/g" /etc/xrdp/sesman.ini \
+ && echo "xfce4-session" >> /etc/skel/.Xsession
+
+COPY ./build/run.sh /
+#RUN chmod +x /run.sh
+
+EXPOSE 3389
+
+ENTRYPOINT ["/run.sh"]

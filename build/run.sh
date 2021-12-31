@@ -2,6 +2,8 @@
 echo Entryponit script is Running...
 echo
 
+os=$(grep -oP '^ID=\"*\K(\w*)' /etc/os-release)
+
 users=$(($#/3))
 mod=$(($# % 3))
 
@@ -24,14 +26,23 @@ echo "You entered $users users"
 while [ $# -ne 0 ]; do
 
     #echo "username is $1"
-    useradd $1
+    if [[ $os == "ubuntu" ]]; then
+        addgroup $1
+        useradd -m -s /bin/bash -g $1 $1
+    else
+        useradd $1
+    fi
     wait
     #getent passwd | grep foo
     echo $1:$2 | chpasswd
     wait
     #echo "sudo is $3"
     if [[ $3 == "yes" ]]; then
-        usermod -aG wheel $1
+        if [[ $os == "ubuntu" ]]; then
+            usermod -aG sudo $1
+        else
+            usermod -aG wheel $1
+        fi
     fi
     wait
     echo "user '$1' is added"
